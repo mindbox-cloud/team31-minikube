@@ -1,9 +1,19 @@
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using team31;
+
+const string livenessCheckRouteName = "liveness";
+const string readinessCheckRouteName = "readiness";
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddHealthChecks()
+    .AddCheck<LivenessHealthCheck>(livenessCheckRouteName)
+    .AddCheck<ReadinessHealthCheck>(readinessCheckRouteName);
 
 var app = builder.Build();
 
@@ -16,7 +26,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/hello", () => "hello")
-    .WithOpenApi();
+app.MapHealthChecks($"health/{livenessCheckRouteName}", new HealthCheckOptions
+{
+    Predicate = h => h.Name == livenessCheckRouteName
+});
+
+app.MapHealthChecks($"health/{readinessCheckRouteName}", new HealthCheckOptions
+{
+    Predicate = h => h.Name == readinessCheckRouteName
+});
 
 app.Run();

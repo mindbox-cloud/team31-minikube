@@ -2,5 +2,9 @@
 
 GET {{team31_HostAddress}}/hello/
 Accept: application/json
-
 ###
+GET {{team31_HostAddress}}/health/readiness
+Accept: application/json
+###
+GET {{team31_HostAddress}}/health/liveness
+Accept: application/json

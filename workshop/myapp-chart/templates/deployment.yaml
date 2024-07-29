@@ -14,14 +14,26 @@ spec:
     spec:
       containers:
       - name: {{ .Release.Name }}
-        image: nginx:latest
-        imagePullPolicy: Always
+        image: team31
+        imagePullPolicy: Never
         resources:
           limits:
             memory: "50Mi"
             cpu: "100m"
         ports:
-        - containerPort: 80
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /health/liveness
+            port: 8080
+          initialDelaySeconds: 1
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health/readiness
+            port: 8080
+          initialDelaySeconds: 1
+          periodSeconds: 3
   replicas: 3
   strategy:
     rollingUpdate:
