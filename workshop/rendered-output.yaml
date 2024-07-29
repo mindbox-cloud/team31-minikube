@@ -1,0 +1,93 @@
+---
+# Source: myapp-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: team3
+  namespace: team3
+spec:
+  selector:
+    app: team3
+  type: ClusterIP
+  ports:
+  - name: team3
+    protocol: TCP
+    port: 80
+    targetPort: 80
+---
+# Source: myapp-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: team3
+  namespace: team3
+spec:
+  selector:
+    matchLabels:
+      app: team3
+  template:
+    metadata:
+      labels:
+        app: team3
+    spec:
+      containers:
+      - name: team3
+        image: nginx:latest
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: "50Mi"
+            cpu: "100m"
+        ports:
+        - containerPort: 80
+  replicas: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+    type: RollingUpdate
+---
+# Source: myapp-chart/templates/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: team3
+  namespace: team3
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: team3
+  minReplicas: 2
+  maxReplicas: 7
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 10
+---
+# Source: myapp-chart/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: team3
+  namespace: team3
+  labels:
+    name: team3
+spec:
+  rules:
+  - host: hello.example
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: team3
+            port: 
+              number: 80

@@ -1,0 +1,6 @@
+﻿services:
+  team31:
+    image: team31
+    build:
+      context: .
+      dockerfile: team31/Dockerfile
