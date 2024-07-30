@@ -3,3 +3,5 @@ releases:
     namespace: team31
     createNamespace: true
     chart: ./myapp-chart
+    atomic: true
+    cleanupOnFail: true
