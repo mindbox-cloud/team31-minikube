@@ -8,9 +8,6 @@ spec:
   selector:
     matchLabels:
       app: {{ .Release.Name }}
-  namespaceSelector:
-    matchNames:
-        -  {{ .Release.Namespace }}
   endpoints:
   - port: yarik-port
     interval: 30s

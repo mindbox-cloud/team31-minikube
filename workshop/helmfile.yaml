@@ -9,6 +9,7 @@ releases:
     chart: ./myapp-chart
     atomic: true
     cleanupOnFail: true
+    disableValidationOnInstall: true
     needs:
       - monitoring/monitoring
   - name: monitoring
@@ -20,3 +21,4 @@ releases:
     atomic: true
     cleanupOnFail: true
     createNamespace: true
+    disableValidationOnInstall: true
