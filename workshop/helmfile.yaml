@@ -1,0 +1,5 @@
+releases:
+  - name: myapp1
+    namespace: team31
+    createNamespace: true
+    chart: ./myapp-chart

@@ -3,43 +3,57 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: team3
-  namespace: team3
+  name: myapp1
+  namespace: team31
 spec:
   selector:
-    app: team3
+    app: myapp1
   type: ClusterIP
   ports:
-  - name: team3
+  - name: myapp1
     protocol: TCP
-    port: 80
-    targetPort: 80
+    port: 8080
+    targetPort: 8080
 ---
 # Source: myapp-chart/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: team3
-  namespace: team3
+  name: myapp1
+  namespace: team31
 spec:
   selector:
     matchLabels:
-      app: team3
+      app: myapp1
   template:
     metadata:
       labels:
-        app: team3
+        app: myapp1
     spec:
       containers:
-      - name: team3
-        image: nginx:latest
-        imagePullPolicy: Always
+      - name: myapp1
+        image: team31
+        imagePullPolicy: Never
         resources:
           limits:
             memory: "50Mi"
             cpu: "100m"
         ports:
-        - containerPort: 80
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /health/liveness
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health/readiness
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 3
+          failureThreshold: 3
+          successThreshold: 3
   replicas: 3
   strategy:
     rollingUpdate:
@@ -51,13 +65,13 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: team3
-  namespace: team3
+  name: myapp1
+  namespace: team31
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: team3
+    name: myapp1
   minReplicas: 2
   maxReplicas: 7
   behavior:
@@ -70,24 +84,4 @@ spec:
       target:
         type: Utilization
         averageUtilization: 10
----
-# Source: myapp-chart/templates/ingress.yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: team3
-  namespace: team3
-  labels:
-    name: team3
-spec:
-  rules:
-  - host: hello.example
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: team3
-            port: 
-              number: 80
+
