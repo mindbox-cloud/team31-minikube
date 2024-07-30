@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using team31;
+using Prometheus;
 
 const string livenessCheckRouteName = "liveness";
 const string readinessCheckRouteName = "readiness";
@@ -35,5 +36,7 @@ app.MapHealthChecks($"health/{readinessCheckRouteName}", new HealthCheckOptions
 {
     Predicate = h => h.Name == readinessCheckRouteName
 });
+
+app.UseMetricServer();
 
 app.Run();

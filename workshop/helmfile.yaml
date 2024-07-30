@@ -9,3 +9,14 @@ releases:
     chart: ./myapp-chart
     atomic: true
     cleanupOnFail: true
+    needs:
+      - monitoring/monitoring
+  - name: monitoring
+    namespace: monitoring
+    chart: prometheus/kube-prometheus-stack
+    values:
+      - grafana:
+          enabled: false
+    atomic: true
+    cleanupOnFail: true
+    createNamespace: true
